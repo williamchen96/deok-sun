@@ -25,3 +25,10 @@ Mobile-first recipe book built with React, TypeScript, and Vite.
 - The app is styled for narrow mobile screens and centers the experience in a phone-sized layout.
 - Uploaded images are stored as data URLs in browser storage.
 - Recipe data persists per browser through `localStorage`.
+
+## GitHub Pages Deployment
+
+- A workflow is configured at `.github/workflows/deploy.yml`.
+- Push to `main` to trigger deployment.
+- In GitHub repository settings, set **Pages** source to **GitHub Actions** (one-time).
+- Site URL: `https://williamchen96.github.io/deok-sun/`
