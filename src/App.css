@@ -216,7 +216,7 @@
 
 .ingredient-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   gap: 0.65rem;
   align-items: center;
 }
@@ -225,13 +225,53 @@
   font-size: 0.86rem;
 }
 
-.ingredient-grid__actions-label {
-  justify-self: center;
+.ingredient-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto;
+  gap: 0.65rem;
+  align-items: center;
 }
 
-.ingredient-list {
+.ingredient-added-list {
   display: grid;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+}
+
+.ingredient-added-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.65rem;
+  color: var(--text-color);
+}
+
+.ingredient-added-item span {
+  line-height: 1.2;
+}
+
+.ingredient-delete-button {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 51, 33, 0.25);
+  background: var(--button-soft);
+  color: var(--text-color);
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.ingredient-delete-button:hover {
+  transform: translateY(-1px);
 }
 
 .detail-panel__header {
@@ -371,6 +411,7 @@
 .danger-button:focus-visible,
 .ghost-button:focus-visible,
 .icon-button:focus-visible,
+.ingredient-delete-button:focus-visible,
 .recipe-card:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
@@ -400,10 +441,10 @@ textarea:focus-visible {
   }
 
   .ingredient-grid {
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr;
   }
 
-  .ingredient-grid--labels span:last-child {
-    display: none;
+  .ingredient-input-row {
+    grid-template-columns: 1fr 1fr auto;
   }
 }

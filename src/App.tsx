@@ -112,7 +112,7 @@ const createEmptyDraft = (): RecipeDraft => ({
   name: '',
   description: '',
   image: '',
-  ingredients: [createIngredient()],
+  ingredients: [],
   stepsText: '',
 })
 
@@ -128,7 +128,7 @@ const createDraftFromRecipe = (recipe?: Recipe): RecipeDraft => {
     ingredients:
       recipe.ingredients.length > 0
         ? recipe.ingredients.map((ingredient) => ({ ...ingredient }))
-        : [createIngredient()],
+        : [],
     stepsText: recipe.steps.join('\n'),
   }
 }
@@ -181,6 +181,8 @@ function RecipeFormView({ mode, initialRecipe, onCancel, onSave }: RecipeFormVie
   const [draft, setDraft] = useState<RecipeDraft>(() =>
     createDraftFromRecipe(initialRecipe),
   )
+  const [ingredientName, setIngredientName] = useState('')
+  const [ingredientAmount, setIngredientAmount] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageSelect = (event: ChangeEvent<HTMLInputElement>) => {
@@ -200,19 +202,20 @@ function RecipeFormView({ mode, initialRecipe, onCancel, onSave }: RecipeFormVie
     reader.readAsDataURL(file)
   }
 
-  const handleIngredientChange = (
-    ingredientId: string,
-    field: 'name' | 'amount',
-    value: string,
-  ) => {
+  const handleAddIngredient = () => {
+    const nextName = ingredientName.trim()
+    const nextAmount = ingredientAmount.trim()
+
+    if (!nextName && !nextAmount) {
+      return
+    }
+
     setDraft((current) => ({
       ...current,
-      ingredients: current.ingredients.map((ingredient) =>
-        ingredient.id === ingredientId
-          ? { ...ingredient, [field]: value }
-          : ingredient,
-      ),
+      ingredients: [...current.ingredients, createIngredient(nextName, nextAmount)],
     }))
+    setIngredientName('')
+    setIngredientAmount('')
   }
 
   const handleRemoveIngredient = (ingredientId: string) => {
@@ -223,7 +226,7 @@ function RecipeFormView({ mode, initialRecipe, onCancel, onSave }: RecipeFormVie
 
       return {
         ...current,
-        ingredients: remaining.length > 0 ? remaining : [createIngredient()],
+        ingredients: remaining,
       }
     })
   }
@@ -233,9 +236,7 @@ function RecipeFormView({ mode, initialRecipe, onCancel, onSave }: RecipeFormVie
     onSave(draft, initialRecipe?.id)
   }
 
-  const ingredientCount = draft.ingredients.filter(
-    (ingredient) => ingredient.name.trim() || ingredient.amount.trim(),
-  ).length
+  const ingredientCount = draft.ingredients.length
 
   return (
     <main className="screen screen--form">
@@ -320,50 +321,49 @@ function RecipeFormView({ mode, initialRecipe, onCancel, onSave }: RecipeFormVie
             <div className="section-title-row">
               <div>
                 <h3>Ingredients</h3>
+                {ingredientCount > 0 && <p>{ingredientCount} added</p>}
               </div>
+            </div>
+
+            <div className="ingredient-grid ingredient-grid--labels">
+              <span>Add Ingredient</span>
+              <span>Add Amount</span>
+            </div>
+
+            <div className="ingredient-input-row">
+              <input
+                value={ingredientName}
+                onChange={(event) => setIngredientName(event.target.value)}
+                placeholder="Eggs"
+              />
+              <input
+                value={ingredientAmount}
+                onChange={(event) => setIngredientAmount(event.target.value)}
+                placeholder="2"
+              />
               <button
                 type="button"
                 className="icon-button icon-button--solid"
-                onClick={() =>
-                  setDraft((current) => ({
-                    ...current,
-                    ingredients: [...current.ingredients, createIngredient()],
-                  }))
-                }
+                onClick={handleAddIngredient}
                 aria-label="Add ingredient"
               >
                 +
               </button>
             </div>
 
-            <div className="ingredient-grid ingredient-grid--labels">
-              <span>Add Ingredient</span>
-              <span>Add Amount</span>
-              <span className="ingredient-grid__actions-label">Action</span>
-            </div>
-
-            <div className="ingredient-list">
+            <div className="ingredient-added-list">
               {draft.ingredients.map((ingredient) => (
-                <div className="ingredient-grid" key={ingredient.id}>
-                  <input
-                    value={ingredient.name}
-                    onChange={(event) =>
-                      handleIngredientChange(ingredient.id, 'name', event.target.value)
-                    }
-                    placeholder="Eggs"
-                  />
-                  <input
-                    value={ingredient.amount}
-                    onChange={(event) =>
-                      handleIngredientChange(ingredient.id, 'amount', event.target.value)
-                    }
-                    placeholder="2"
-                  />
+                <div className="ingredient-added-item" key={ingredient.id}>
+                  <span>
+                    {ingredient.name}
+                    {ingredient.name && ingredient.amount ? ' ' : ''}
+                    {ingredient.amount}
+                  </span>
                   <button
                     type="button"
-                    className="icon-button"
+                    className="ingredient-delete-button"
                     onClick={() => handleRemoveIngredient(ingredient.id)}
-                    aria-label="Remove ingredient"
+                    aria-label={`Delete ${ingredient.name || 'ingredient'}`}
                   >
                     ⊗
                   </button>
